@@ -1,19 +1,19 @@
 let modInfo = {
-	name: "The ??? Tree",
-	author: "nobody",
+	name: "The Ultimate Prestige Tree",
+	author: "RaceDev",
 	pointsName: "points",
 	modFiles: ["layers.js", "tree.js"],
 
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (10), // Used for hard resets and new players
+	initialStartPoints: new Decimal (0), // Used for hard resets and new players
 	offlineLimit: 1,  // In hours
 }
 
 // Set your version in num and name
 let VERSION = {
 	num: "0.0",
-	name: "Literally nothing",
+	name: "The Launch",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
@@ -42,6 +42,27 @@ function getPointGen() {
 		return new Decimal(0)
 
 	let gain = new Decimal(1)
+
+    if (hasUpgrade('p', 11)) gain = gain.times(2)
+	if (hasUpgrade('p', 12)) gain = gain.times(upgradeEffect('p', 12))
+	if (hasMilestone('p', 0)) gain = gain.times(10)
+	if (hasUpgrade('r', 11)) gain = gain.times(2)
+	if (hasUpgrade('r', 12)) gain = gain.times(upgradeEffect('r', 12))
+	if (hasUpgrade('r', 13)) gain = gain.pow(1.3)
+	if (hasUpgrade('r', 15)) gain = gain.times(upgradeEffect('r', 15))
+	if (hasUpgrade('p', 14)) gain = gain.times(10)
+	if (hasMilestone('r', 0)) gain = gain.pow(1.5)
+	if (hasMilestone('d', 0)) gain = gain.times(5)
+	if (hasMilestone('d', 1)) gain = gain.pow(1.5)
+	if (inChallenge('d', 11)) gain = gain.pow(0.01)
+	if (hasMilestone('d', 3)) gain = gain.pow(1.5)
+	if (hasMilestone('d', 5)) gain = gain.pow(2)
+	if (hasMilestone('d', 6)) gain = gain.pow(1.3)
+	if (hasMilestone('d', 7)) gain = gain.pow(10)
+	if (hasMilestone('d', 8)) gain = gain.pow(3)
+	if (hasUpgrade('d', 11)) gain = gain.tetrate(1.1)
+	if (hasUpgrade('d', 12)) gain = gain.times(upgradeEffect('d', 12))
+	
 	return gain
 }
 
@@ -51,14 +72,13 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
+	"<br><h3> endgame: 1 omega point </h3>",
 ]
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("e280000000"))
+	return player.o.points.gte(1)
 }
-
-
 
 // Less important things beyond this point!
 
