@@ -200,7 +200,7 @@ addLayer("r", {
         0: {
             requirementDescription: "1e16 Rebirth Points",
             effectDescription: "^1.5 Points lol",
-            done() { return player[this.layer].points.gte(1e16) },
+            done() { return player[this.layer].points.gte(1e16) && hasUpgrade('r', 17) },
             unlocked() { return hasUpgrade('r', 17) },
         },
     },
@@ -316,7 +316,7 @@ addLayer("d", {
         9: {
             requirementDescription: "100 Divine Points",
             effectDescription: "Unlock a new reset layer",
-            done() { return player[this.layer].points.gte(100) },
+            done() { return player[this.layer].points.gte(100) && hasUpgrade('d', 14) },
             unlocked() { return hasUpgrade('d', 14) }
         }
     },
