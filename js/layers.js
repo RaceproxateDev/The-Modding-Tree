@@ -97,8 +97,15 @@ addLayer("p", {
 
        let keep = []
        if (hasMilestone('d', 4)) keep.push("upgrades")
+       if (hasMilestone('o', 6)) keep.push("upgrades")
 
        layerDataReset(this.layer, keep)
+    },
+
+    passiveGeneration() {
+        let p = new Decimal(0)
+        if (hasMilestone('o', 1)) p = p.add(1)
+        return p
     }
 })
 
@@ -217,8 +224,15 @@ addLayer("r", {
 
        let keep = []
        if (hasUpgrade('d', 13)) keep.push("upgrades")
+       if (hasMilestone('o', 6)) keep.push("upgrades")
 
        layerDataReset(this.layer, keep)
+    },
+
+    passiveGeneration() {
+        let p = new Decimal(0)
+        if (hasMilestone('o', 1)) p = p.add(1)
+        return p
     }
 }),
 
@@ -227,6 +241,20 @@ addLayer("d", {
         unlocked: false,                     // You can add more variables here to add them to your layer.
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
     }},
+
+    doReset(layer) {
+       if(layers[layer].row <= layers[this.layer].row || layers[layer].row == "side")return;
+       
+       let keep = []
+       let keepMilestones = []
+
+       if (hasMilestone('o', 3)) keepMilestones.push(5)
+       if (hasMilestone('o', 4)) keep.push("challenges")
+
+       keep.push(keepMilestones) 
+
+       layerDataReset(this.layer, keep)
+    },
 
     branches: ["r"],
 
@@ -380,6 +408,14 @@ addLayer("d", {
         }
     },
 
+    passiveGeneration() {
+        let p = new Decimal(0)
+        if (hasMilestone('o', 0)) p = p.add(1)
+        if (hasMilestone('o', 1)) p = p.add(9)
+        if (hasMilestone('o', 5)) p = p.add(10)
+        return p
+    },
+
     unlocked() { return player.points.gte("1e1000") }, // The layer is unlocked when the player reaches 1e1000 points.
 })
 
@@ -402,10 +438,13 @@ addLayer("o", {
                                             // Also the amount required to unlock the layer.
 
     type: "normal",                         // Determines the formula used for calculating prestige currency.
-    exponent: 2,                          // "normal" prestige gain is (currency^exponent).
+    exponent: 0.5,                          // "normal" prestige gain is (currency^exponent).
 
     gainMult() {                            // Returns your multiplier to your gain of the prestige resource.
-        return new Decimal(1)               // Factor in any bonuses multiplying gain here.
+        let mult = new Decimal(1)
+        if (hasMilestone('o', 5)) mult = mult.times(1.1)
+        if (hasMilestone('o', 6)) mult = mult.times(5)
+        return mult                            // Factor in any bonuses multiplying gain here.
     },
     gainExp() {                             // Returns the exponent to your gain of the prestige resource.
         return new Decimal(1)
@@ -417,6 +456,61 @@ addLayer("o", {
         "Milestones": {
             content: ["main-display","prestige-button","blank","milestones"]
         },
+    },
+
+    milestones: {
+        0: {
+            requirementDescription: "1 Omega Point",
+            effectDescription: "Passively gain 100% of your divine points per second",
+            done() { return player[this.layer].points.gte(1) }
+        },
+
+        1: {
+            requirementDescription: "5 Omega Points",
+            effectDescription: "Passively gain 100% of your Prestige and Rebirth points per second, also +900% divine point passive gain",
+            done() { return player[this.layer].points.gte(5) }
+        },
+
+        2: {
+            requirementDescription: "8 Omega Points",
+            effectDescription: "^^1.5 Points",
+            done() { return player[this.layer].points.gte(8) }
+        },
+
+        3: {
+            requirementDescription: "10 Omega Points",
+            effectDescription: "Keep 5 divine milestones on omega reset",
+            done() { return player[this.layer].points.gte(10) },
+            unlocked() { return hasMilestone('o', 2) },
+        },
+
+        4: {
+            requirementDescription: "15 Omega Points",
+            effectDescription: "Keep all divine challenges on omega reset",
+            done() { return player[this.layer].points.gte(15) },
+            unlocked() { return hasMilestone('o', 3) },
+        },
+
+        5: {
+            requirementDescription: "25 Omega Points",
+            effectDescription: "+1000% divine passive generation and ^100 Points also 1.1x Omega point gain",
+            done() { return player[this.layer].points.gte(25) },
+            unlocked() { return hasMilestone('o', 4) },
+        },
+
+        6: {
+            requirementDescription: "50 Omega Points",
+            effectDescription: "Keep Prestige and Rebirth Upgrades on omega reset, 5x Omega",
+            done() { return player[this.layer].points.gte(50) },
+            unlocked() { return hasMilestone('o', 5) },
+        },
+
+        7: {
+            requirementDescription: "80 Omega Points",
+            effectDescription: "x1e10000 Points",
+            done() { return player[this.layer].points.gte(80) },
+            unlocked() { return hasMilestone('o', 6) },
+        }
     },
 
     unlocked() { return player.d.points.gte("100") && hasMilestone('d', 9) }, // The layer is unlocked when the player reaches 1F100 points.
